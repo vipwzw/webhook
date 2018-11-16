@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -96,15 +97,19 @@ func execShell(id, user, branch string) {
 		return
 	}
 	log.Println("2. clone ok")
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
 	cmd = exec.Command("make", "webhook")
 	cmd.Dir = gitpath
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 	cmd.Env = append(os.Environ(),
 		"ChangeID="+id,
 		"name="+user,
 		"b="+branch,
 	)
 	if err := cmd.Run(); err != nil {
-		log.Println("run make webhook", err)
+		log.Println("run make webhook", err, stdout.String(), stderr.String())
 		return
 	}
 	log.Println("3. run ok")
