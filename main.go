@@ -23,7 +23,7 @@ var test = flag.Bool("t", false, "is test mode")
 func main() {
 	flag.Parse()
 	if *test {
-		execShell("1", "vipwzw", "fixpush_bug")
+		execShell("1", "33cn", "master")
 		return
 	}
 	hook, _ := github.New(github.Options.Secret(""))
