@@ -73,7 +73,7 @@ func webhooksProcess(ch chan interface{}) {
 
 func processGithubPL(payload github.PullRequestPayload) {
 	id := fmt.Sprintf("%d", payload.PullRequest.ID)
-	user := payload.PullRequest.User.Login
+	user := payload.PullRequest.Head.User.Login
 	branch := payload.PullRequest.Head.Ref
 	proj := payload.PullRequest.Head.Repo.Name
 	execShell(id, user, proj, branch)
