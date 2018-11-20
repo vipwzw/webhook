@@ -17,13 +17,12 @@ const (
 	path = "/webhooks"
 )
 
-var project = flag.String("p", "chain33", "the github project name")
 var test = flag.Bool("t", false, "is test mode")
 
 func main() {
 	flag.Parse()
 	if *test {
-		execShell("1", "vipwzw", "master")
+		execShell("1", "vipwzw", "chain33", "master")
 		return
 	}
 	hook, _ := github.New(github.Options.Secret(""))
@@ -76,14 +75,15 @@ func processGithubPL(payload github.PullRequestPayload) {
 	id := fmt.Sprintf("%d", payload.PullRequest.ID)
 	user := payload.PullRequest.User.Login
 	branch := payload.PullRequest.Head.Ref
-	execShell(id, user, branch)
+	proj := payload.PullRequest.Head.Repo.Name
+	execShell(id, user, proj, branch)
 }
 
-func execShell(id, user, branch string) {
+func execShell(id, user, project, branch string) {
 	log.Println("run", id, user, branch)
 	gopath := os.Getenv("GOPATH")
-	repo := "https://github.com/" + user + "/" + *project + ".git"
-	gitpath := gopath + "/src/github.com/33cn/" + *project
+	repo := "https://github.com/" + user + "/" + project + ".git"
+	gitpath := gopath + "/src/github.com/33cn/" + project
 	log.Println("git path", gitpath)
 	cmd := exec.Command("rm", "-rf", gitpath)
 	if err := cmd.Run(); err != nil {
