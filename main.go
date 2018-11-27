@@ -91,7 +91,7 @@ func execShell(id, user, project, branch string) {
 		return
 	}
 	log.Println("1. del path ok")
-	cmd = exec.Command("git", "clone", repo, gitpath)
+	cmd = exec.Command("git", "clone", "-b" , branch, repo, gitpath)
 	if err := cmd.Run(); err != nil {
 		log.Println("run git", err)
 		return
