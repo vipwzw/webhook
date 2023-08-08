@@ -19,7 +19,7 @@ const (
 
 var test = flag.Bool("t", false, "is test mode")
 
-func main() {
+func mainx() {
 	flag.Parse()
 	if *test {
 		execShell("1", "vipwzw", "chain33", "master")
@@ -91,7 +91,7 @@ func execShell(id, user, project, branch string) {
 		return
 	}
 	log.Println("1. del path ok")
-	cmd = exec.Command("git", "clone", "-b" , branch, repo, gitpath)
+	cmd = exec.Command("git", "clone", "-b", branch, repo, gitpath)
 	if err := cmd.Run(); err != nil {
 		log.Println("run git", err)
 		return

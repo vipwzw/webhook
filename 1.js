@@ -8,20 +8,20 @@ async function delay(seconds) {
 
 const player = require('play-sound')();
 
-function playAudio(file, times) {
-    if (times <= 0) {
-      console.log('音频播放完成', 0);
-      return;
-    }
-    player.play(file, (err) => {
-      if (err) {
-        console.error('播放音频时发生错误:', err);
-      } else {
-        console.log('音频播放完成', times);
-        playAudio(file, times - 1); // 递归调用，次数减一
-      }
+async function playAudio(musicPath) {
+    // 播放音乐
+    const playerPromise = new Promise((resolve, reject) => {
+      player.play(musicPath, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     });
-  }
+    // 等待音乐播放完成
+    return playerPromise;
+}
 
 // 找到所有行
 async function getTableData(table) {
@@ -40,6 +40,35 @@ async function getTableData(table) {
     return tableData
 }
 
+function hasTicket(tabledata) {
+    console.log("beg", tabledata.length)
+    for (var i = 0; i < tabledata.length; i++) {
+        if (hasTicketRow(tabledata[i])) {
+            return true
+        }
+    }
+    console.log("end", tabledata.length)
+    return false
+}
+
+function hasTicketRow(row) {
+    for (var i = 1; i < row.length; i++) {
+        const item = row[i]
+        if (item == "--" || item == "候补" || item == "预定") {
+            continue
+        }
+        if (item == "有") {
+            return true
+        }
+        var ticketNumber = parseInt(item)
+        if (!isNaN(ticketNumber) && ticketNumber > 0) {
+            console.log(row[0], "有 ", ticketNumber, " 张票。")
+            return true
+        }
+    }
+    return false
+}
+
 async function waitUntilPageLoaded() {
     await driver.get("https://www.12306.cn/index/");
     await driver.wait(until.urlContains("https://kyfw.12306.cn/otn/leftTicket/init?linktypeid=dc"),  600000);
@@ -54,12 +83,14 @@ async function waitUntilPageLoaded() {
         // Find the <table> element within the parent <div> using CSS selector
         const table = await parentDiv.findElement(By.css('table'));
         var data = await getTableData(table)
-        if hasTicket(data) {
-           playAudio("./sample-6s.mp3", 10)
+        if (hasTicket(data)) {
+            for (var i = 0; i < 10; i++) {
+                await playAudio("./sample-6s.mp3")
+            }
         }
         console.log(data)
       } catch (e) {
-         console.log(e)
+        console.log(e)
       }
     }
     await driver.quit()
